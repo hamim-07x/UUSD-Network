@@ -1,11 +1,37 @@
-<div align="center">
+# UUSD Network (Telegram Mini App)
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+Vite + React + TypeScript + Firebase. In-app wallet, rewards, referrals, admin panel, PIN-protected sends.
 
-  <h1>Built with AI Studio</h2>
+## Quick start
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+```bash
+npm install
+npm run dev
+```
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+## Firebase
 
-</div>
+1. Put your web config in `firebase-applet-config.json` (placeholders are there).
+2. Create Firestore; deploy `firestore.rules`.
+3. See **AI_GUIDE.md** for collections and safe edit zones.
+
+## Deploy (Vercel)
+
+- Framework: Vite
+- Build: `npm run build`
+- Output: `dist`
+- `vercel.json` already has SPA rewrites.
+
+## Admin
+
+- URL: `/admin`
+- Demo login: `admin` / `uusdadmin2026`
+
+## Scripts
+
+| Command | Purpose |
+|---------|---------|
+| `npm run dev` | Local dev |
+| `npm run build` | Production build |
+| `npm run preview` | Preview build |
+| `npm run lint` | `tsc --noEmit` |

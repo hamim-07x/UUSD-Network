@@ -1,0 +1,61 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ============================================================
+    // #AI_NOTE: DEMO RULES — AI Studio / testing only.
+    // Before 1M+ users or real funds: restrict writes to owner + admin.
+    // Verify Telegram initData on backend. Never leave api_keys public.
+    // ============================================================
+
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /wallets/{userId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /activities/{activityId} {
+      allow read: if true;
+      allow create: if true;
+      allow update, delete: if false;
+    }
+
+    match /tasks/{taskId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /events/{eventId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /completed_tasks/{userId} {
+      allow read, write: if true;
+    }
+
+    match /referrals/{refId} {
+      allow read, write: if true;
+    }
+
+    match /user_settings/{userId} {
+      allow read, write: if true;
+    }
+
+    // PIN hashes — required for withdraw PIN feature
+    match /user_security/{userId} {
+      allow read, write: if true;
+    }
+
+    match /settings/{docId} {
+      allow read, write: if true;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
