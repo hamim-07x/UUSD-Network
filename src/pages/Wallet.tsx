@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Copy, Check, Send, Plus, ArrowUp, ArrowDown, ScanLine, Wallet as WalletIcon, Settings } from "lucide-react";
+import { Copy, Check, Send, Plus, ArrowUp, ArrowDown, ScanLine, Wallet as WalletIcon, Settings, ArrowDownLeft, ArrowUpRight, Gift, Clock, XCircle, CheckCircle2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTelegramUser } from "../hooks/useTelegramUser";
 import { useWallet } from "../hooks/useWallet";
@@ -248,31 +248,59 @@ export function Wallet() {
                     default: title = activity.type;
                   }
 
+                  let ActionIcon = Plus;
+                  let iconColor = "text-emerald-400";
+                  let iconBg = "bg-emerald-400/10";
+                  
+                  if (activity.type === 'deposit' || activity.type === 'transfer_in') {
+                    ActionIcon = ArrowDownLeft;
+                    iconColor = "text-emerald-400";
+                    iconBg = "bg-emerald-400/10";
+                  } else if (activity.type === 'withdraw' || activity.type === 'transfer_out') {
+                    ActionIcon = ArrowUpRight;
+                    iconColor = "text-rose-400";
+                    iconBg = "bg-rose-400/10";
+                  } else if (activity.type === 'earn') {
+                    ActionIcon = Gift;
+                    iconColor = "text-[#8792FF]";
+                    iconBg = "bg-[#8792FF]/10";
+                  }
+
                   return (
                     <div 
                       key={activity.id}
-                      className="flex items-center justify-between py-3.5 hover:bg-white/[0.02] rounded-2xl px-2 transition-colors"
+                      className="flex items-center justify-between py-3 hover:bg-white/[0.02] rounded-2xl px-2 transition-colors"
                     >
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-full flex items-center justify-center relative overflow-hidden bg-white/[0.04] p-0.5 shadow-sm">
-                          {token ? (
-                            <img src={token.imgUrl || undefined} alt={token.name} className="w-full h-full object-cover rounded-full" />
-                          ) : (
-                            isPositive ? <Plus className="w-5 h-5 text-emerald-400" /> : <ArrowUp className="w-5 h-5 text-rose-400" />
-                          )}
-                        </div>
-                        <div className="flex flex-col gap-0.5">
-                          <span className="text-[16px] font-bold text-white">{title}</span>
-                          <span className="text-[12px] font-medium text-white/40">
+                      <div className="flex items-center gap-3 min-w-0">
+                        {token ? (
+                          <div className="w-10 h-10 rounded-full flex items-center justify-center relative overflow-hidden bg-white/[0.04] p-0.5 shadow-sm shrink-0">
+                            <img src={token.imgUrl} alt={token.symbol} className="w-full h-full object-cover rounded-full" />
+                            <div className={`absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center ${iconBg} border-2 border-[#13141a]`}>
+                              <ActionIcon className={`w-2.5 h-2.5 ${iconColor}`} />
+                            </div>
+                          </div>
+                        ) : (
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center relative ${iconBg} shadow-sm shrink-0`}>
+                            <ActionIcon className={`w-5 h-5 ${iconColor}`} />
+                          </div>
+                        )}
+                        <div className="flex flex-col gap-0.5 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[15px] font-bold text-white truncate">{title}</span>
+                            {activity.status === 'completed' && <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-400/10 text-emerald-400 uppercase tracking-wider shrink-0">Done</span>}
+                            {activity.status === 'pending' && <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-400/10 text-amber-400 uppercase tracking-wider shrink-0">Pending</span>}
+                            {activity.status === 'failed' && <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-rose-400/10 text-rose-400 uppercase tracking-wider shrink-0">Failed</span>}
+                          </div>
+                          <span className="text-[12px] font-medium text-white/40 truncate">
                             {new Date(activity.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} at {new Date(activity.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </span>
                         </div>
                       </div>
-                      <div className="flex flex-col items-end gap-0.5">
-                        <span className={`text-[16px] font-bold ${isPositive ? 'text-emerald-400' : 'text-white'}`}>
+                      <div className="flex flex-col items-end gap-0.5 shrink-0 ml-3">
+                        <span className={`text-[15px] font-bold ${isPositive ? 'text-emerald-400' : 'text-white'} whitespace-nowrap`}>
                           {isPositive ? '+' : '-'}{Number(activity.amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 })} {activity.symbol}
                         </span>
-                        <span className="text-[13px] font-medium text-white/50">${Number(dollarValue).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        <span className="text-[12px] font-medium text-white/50 whitespace-nowrap">${Number(dollarValue).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                       </div>
                     </div>
                   );

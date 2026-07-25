@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { TOKENS } from "../lib/tokens";
 import { getEvents, getTasks, getCompletedTasks, saveCompletedTasks } from "../lib/db";
 import { verifyTaskCompletion, getReferralCount } from "../lib/verifyTask";
+import WebApp from '@twa-dev/sdk';
 import { useSettings } from "../lib/SettingsContext";
 
 export function Rewards() {
@@ -159,7 +160,15 @@ export function Rewards() {
     if (currentState === "start") {
       // Open task link when present
       if (task.link && !isReferral) {
-        window.open(task.link, "_blank", "noopener,noreferrer");
+        try {
+          if ((task.link.includes('t.me') || task.link.includes('telegram.me')) && WebApp.initDataUnsafe?.user) {
+            WebApp.openTelegramLink(task.link);
+          } else {
+            window.open(task.link, "_blank", "noopener,noreferrer");
+          }
+        } catch (e) {
+          window.open(task.link, "_blank", "noopener,noreferrer");
+        }
       }
 
       // Always 5 second countdown before Verify appears
