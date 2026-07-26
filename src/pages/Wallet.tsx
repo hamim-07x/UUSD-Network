@@ -15,6 +15,8 @@ export function Wallet() {
   const { address, fullWallet, isLoading, activities, needsCreation, isCreating, createWallet } = useWallet(telegramUser);
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<'crypto' | 'activity'>('crypto');
+  const [activityFilter, setActivityFilter] = useState<'all' | 'received' | 'sent' | 'rewards'>('all');
+  const [selectedActivity, setSelectedActivity] = useState<any>(null);
   const navigate = useNavigate();
   
   const [livePrices, setLivePrices] = useState<Record<string, { price: number, change24h: number }>>({});
@@ -76,6 +78,51 @@ export function Wallet() {
       value: value.toFixed(2)
     };
   }).sort((a, b) => b.amountNum - a.amountNum);
+
+  const getActivityDetails = (activity: any) => {
+    let title = "";
+    let isPositive = false;
+    
+    switch(activity.type) {
+      case 'deposit': title = "Deposit"; isPositive = true; break;
+      case 'withdraw': title = "Withdraw"; isPositive = false; break;
+      case 'transfer_out': title = `To ${activity.toAddress ? (activity.toAddress.substring(0,6) + '...' + activity.toAddress.substring(activity.toAddress.length - 4)) : (activity.toName || "Address")}`; isPositive = false; break;
+      case 'transfer_in': title = `From ${activity.fromAddress ? (activity.fromAddress.substring(0,6) + '...' + activity.fromAddress.substring(activity.fromAddress.length - 4)) : (activity.fromName || "Address")}`; isPositive = true; break;
+      case 'earn': title = 'Reward'; isPositive = true; break;
+      default: title = activity.type;
+    }
+
+    let ActionIcon = Plus;
+    let iconColor = "text-emerald-400";
+    let iconBg = "bg-emerald-400/10";
+    
+    if (activity.type === 'deposit' || activity.type === 'transfer_in') {
+      ActionIcon = ArrowDownLeft;
+      iconColor = "text-emerald-400";
+      iconBg = "bg-emerald-400/10";
+    } else if (activity.type === 'withdraw' || activity.type === 'transfer_out') {
+      ActionIcon = ArrowUpRight;
+      iconColor = "text-rose-400";
+      iconBg = "bg-rose-400/10";
+    } else if (activity.type === 'earn') {
+      ActionIcon = Gift;
+      iconColor = "text-[#8792FF]";
+      iconBg = "bg-[#8792FF]/10";
+    }
+    
+    return { title, isPositive, ActionIcon, iconColor, iconBg };
+  };
+
+  const filteredActivities = React.useMemo(() => {
+    if (!activities) return [];
+    return activities.filter(act => {
+      if (activityFilter === 'all') return true;
+      if (activityFilter === 'sent') return act.type === 'withdraw' || act.type === 'transfer_out';
+      if (activityFilter === 'received') return act.type === 'deposit' || act.type === 'transfer_in';
+      if (activityFilter === 'rewards') return act.type === 'earn';
+      return true;
+    });
+  }, [activities, activityFilter]);
 
   const handleCopy = () => {
     if (!address) return;
@@ -230,60 +277,41 @@ export function Wallet() {
               </div>
             ))
           ) : (
-            <AnimatePresence>
-              {activities && activities.length > 0 ? (
-                activities.map((activity, index) => {
+            <div className="flex flex-col gap-4">
+              {/* Activity Filters */}
+              <div className="flex items-center gap-2 overflow-x-auto pb-1 hide-scrollbar">
+                {(['all', 'received', 'sent', 'rewards'] as const).map(filter => (
+                  <button
+                    key={filter}
+                    onClick={() => setActivityFilter(filter)}
+                    className={`px-4 py-1.5 rounded-full text-[13px] font-bold whitespace-nowrap transition-colors ${
+                      activityFilter === filter 
+                        ? 'bg-white/10 text-white' 
+                        : 'bg-transparent text-white/40 hover:bg-white/5'
+                    }`}
+                  >
+                    {filter.charAt(0).toUpperCase() + filter.slice(1)}
+                  </button>
+                ))}
+              </div>
+
+              <AnimatePresence>
+                {filteredActivities && filteredActivities.length > 0 ? (
+                filteredActivities.map((activity, index) => {
                   const token = TOKENS.find(t => t.symbol === activity.symbol);
                   const dollarValue = (activity.amount * (token?.price || 0)).toFixed(2);
-                  
-                  let title = "";
-                  let isPositive = false;
-                  
-                  switch(activity.type) {
-                    case 'deposit': title = "Deposit"; isPositive = true; break;
-                    case 'withdraw': title = "Withdraw"; isPositive = false; break;
-                    case 'transfer_out': title = `Sent to ${activity.toAddress ? (activity.toAddress.substring(0,6) + '...' + activity.toAddress.substring(activity.toAddress.length - 4)) : (activity.toName || "Address")}`; isPositive = false; break;
-                    case 'transfer_in': title = `Received from ${activity.fromAddress ? (activity.fromAddress.substring(0,6) + '...' + activity.fromAddress.substring(activity.fromAddress.length - 4)) : (activity.fromName || "Address")}`; isPositive = true; break;
-                    case 'earn': title = 'Reward'; isPositive = true; break;
-                    default: title = activity.type;
-                  }
-
-                  let ActionIcon = Plus;
-                  let iconColor = "text-emerald-400";
-                  let iconBg = "bg-emerald-400/10";
-                  
-                  if (activity.type === 'deposit' || activity.type === 'transfer_in') {
-                    ActionIcon = ArrowDownLeft;
-                    iconColor = "text-emerald-400";
-                    iconBg = "bg-emerald-400/10";
-                  } else if (activity.type === 'withdraw' || activity.type === 'transfer_out') {
-                    ActionIcon = ArrowUpRight;
-                    iconColor = "text-rose-400";
-                    iconBg = "bg-rose-400/10";
-                  } else if (activity.type === 'earn') {
-                    ActionIcon = Gift;
-                    iconColor = "text-[#8792FF]";
-                    iconBg = "bg-[#8792FF]/10";
-                  }
+                  const { title, isPositive, ActionIcon, iconColor, iconBg } = getActivityDetails(activity);
 
                   return (
                     <div 
                       key={activity.id}
-                      className="flex items-center justify-between py-3 hover:bg-white/[0.02] rounded-2xl px-2 transition-colors"
+                      onClick={() => setSelectedActivity(activity)}
+                      className="flex items-center justify-between py-3 hover:bg-white/[0.02] rounded-2xl px-2 transition-colors cursor-pointer"
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        {token ? (
-                          <div className="w-10 h-10 rounded-full flex items-center justify-center relative overflow-hidden bg-white/[0.04] p-0.5 shadow-sm shrink-0">
-                            <img src={token.imgUrl} alt={token.symbol} className="w-full h-full object-cover rounded-full" />
-                            <div className={`absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center ${iconBg} border-2 border-[#13141a]`}>
-                              <ActionIcon className={`w-2.5 h-2.5 ${iconColor}`} />
-                            </div>
-                          </div>
-                        ) : (
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center relative ${iconBg} shadow-sm shrink-0`}>
-                            <ActionIcon className={`w-5 h-5 ${iconColor}`} />
-                          </div>
-                        )}
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center relative ${iconBg} shadow-sm shrink-0`}>
+                          <ActionIcon className={`w-5 h-5 ${iconColor}`} />
+                        </div>
                         <div className="flex flex-col gap-0.5 min-w-0">
                           <div className="flex items-center gap-2">
                             <span className="text-[15px] font-bold text-white truncate">{title}</span>
@@ -297,9 +325,12 @@ export function Wallet() {
                         </div>
                       </div>
                       <div className="flex flex-col items-end gap-0.5 shrink-0 ml-3">
-                        <span className={`text-[15px] font-bold ${isPositive ? 'text-emerald-400' : 'text-white'} whitespace-nowrap`}>
-                          {isPositive ? '+' : '-'}{Number(activity.amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 })} {activity.symbol}
-                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <span className={`text-[15px] font-bold ${isPositive ? 'text-emerald-400' : 'text-white'} whitespace-nowrap`}>
+                            {isPositive ? '+' : '-'}{Number(activity.amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 })}
+                          </span>
+                          <span className="text-[13px] font-bold text-white">{activity.symbol}</span>
+                        </div>
                         <span className="text-[12px] font-medium text-white/50 whitespace-nowrap">${Number(dollarValue).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                       </div>
                     </div>
@@ -318,9 +349,74 @@ export function Wallet() {
                 </motion.div>
               )}
             </AnimatePresence>
+            </div>
           )}
         </div>
       </div>
+      
+      {/* Activity Details Modal */}
+      <AnimatePresence>
+        {selectedActivity && (() => {
+          const { title, isPositive, ActionIcon, iconColor, iconBg } = getActivityDetails(selectedActivity);
+          return (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setSelectedActivity(null)}
+                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              />
+              <motion.div 
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                className="relative w-full max-w-sm bg-[#1e1f29] border border-white/10 rounded-3xl p-6 shadow-2xl flex flex-col items-center gap-4"
+              >
+                <div className={`w-12 h-12 rounded-full ${iconBg} flex items-center justify-center`}>
+                  <ActionIcon className={`w-6 h-6 ${iconColor}`} />
+                </div>
+                <div className="text-center">
+                  <div className="text-sm text-white/50 mb-1">{title}</div>
+                  <div className={`text-2xl font-bold ${isPositive ? 'text-emerald-400' : 'text-white'}`}>
+                    {isPositive ? '+' : '-'}{Number(selectedActivity.amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 8 })} {selectedActivity.symbol}
+                  </div>
+                </div>
+                
+                <div className="w-full bg-white/[0.02] rounded-xl p-4 flex flex-col gap-3 mt-2 border border-white/5">
+                  <div className="flex justify-between">
+                    <span className="text-sm text-white/40">Status</span>
+                    <span className="text-sm text-white capitalize font-medium">{selectedActivity.status}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-white/40">Date</span>
+                    <span className="text-sm text-white font-medium">{new Date(selectedActivity.timestamp).toLocaleString()}</span>
+                  </div>
+                  {selectedActivity.toAddress && (
+                    <div className="flex justify-between gap-4">
+                      <span className="text-sm text-white/40">To</span>
+                      <span className="text-sm text-white font-medium break-all text-right">{selectedActivity.toAddress}</span>
+                    </div>
+                  )}
+                  {selectedActivity.fromAddress && (
+                    <div className="flex justify-between gap-4">
+                      <span className="text-sm text-white/40">From</span>
+                      <span className="text-sm text-white font-medium break-all text-right">{selectedActivity.fromAddress}</span>
+                    </div>
+                  )}
+                </div>
+                
+                <button 
+                  onClick={() => setSelectedActivity(null)}
+                  className="w-full mt-2 py-3 bg-white/10 hover:bg-white/15 text-white font-bold rounded-xl transition-colors"
+                >
+                  Close
+                </button>
+              </motion.div>
+            </div>
+          );
+        })()}
+      </AnimatePresence>
     </motion.div>
   );
 }

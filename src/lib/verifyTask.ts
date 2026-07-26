@@ -14,7 +14,7 @@
  * so users are not falsely rewarded.
  */
 
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, query, where, getDoc, doc } from "firebase/firestore";
 import { db } from "./firebase";
 import { app } from "./firebase";
 
@@ -63,8 +63,34 @@ export async function verifyTelegramJoin(
   if (!chatId) {
     return { ok: false, message: "Invalid Telegram link on this task." };
   }
-
-  return { ok: true, message: "Mocked Telegram verification in AI Studio" };
+  
+  try {
+    const settingsSnap = await getDoc(doc(db, "settings", "api_keys"));
+    const botToken = settingsSnap.exists() ? settingsSnap.data().telegramBotToken : null;
+    
+    if (!botToken) {
+      return { ok: false, message: "Verification system is not configured. Please contact admin." };
+    }
+    
+    // Direct API call from client. Since this is an AI Studio demo without backend,
+    // we bypass CORS by hoping telegram API accepts it, or we rely on the bot token.
+    // Note: api.telegram.org supports CORS for some endpoints.
+    const res = await fetch(`https://api.telegram.org/bot${botToken}/getChatMember?chat_id=${chatId}&user_id=${telegramId}`);
+    const data = await res.json();
+    
+    if (data.ok) {
+      const status = data.result.status;
+      if (['member', 'administrator', 'creator'].includes(status)) {
+        return { ok: true };
+      }
+      return { ok: false, message: "Please join the channel first." };
+    } else {
+      return { ok: false, message: "Failed to verify. Bot might not be an admin in the channel." };
+    }
+  } catch (e) {
+    console.error("verifyTelegramJoin error", e);
+    return { ok: false, message: "Verification failed due to a network error." };
+  }
 }
 
 /**
