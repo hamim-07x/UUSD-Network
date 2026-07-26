@@ -333,116 +333,56 @@ export function Rewards() {
       </div>
 
       <AnimatePresence mode="wait">
-        {!selectedEventId ? (
-          <motion.div 
-            key="events-list"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="flex flex-col gap-4 px-2 pb-24"
-          >
-            {events.length > 0 && (
-              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar mask-edges-right mb-2">
-                {eventCategories.map(cat => (
-                  <button 
-                    key={cat}
-                    onClick={() => setActiveEventCategory(cat as string)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 ${activeEventCategory === cat ? 'bg-[#8792FF] text-white shadow-[0_2px_8px_rgba(135,146,255,0.4)]' : 'bg-white/5 text-white/50 hover:bg-white/10'}`}
-                  >
-                    {cat as string}
-                  </button>
-                ))}
-              </div>
-            )}
-            
-            {filteredEvents.map(ev => {
-              const tLeft = timeLefts[ev.id] || { days: 0, hours: 0, mins: 0, secs: 0 };
+        <motion.div 
+          key="tasks-view"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col px-2 mt-2 pb-24"
+        >
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar mask-edges-right mb-4 pb-2 border-b border-white/5">
+            {events.map(ev => {
+              const eventTasksCount = tasks.filter(t => t.eventId === ev.id || (ev.id === 'default' && (!t.eventId || t.eventId === 'default'))).length;
+              const isActive = (selectedEventId || events[0]?.id) === ev.id;
               return (
-                <div key={ev.id} className="w-full aspect-[16/9] rounded-[24px] overflow-hidden relative shadow-lg border border-white/5 bg-[#13141a]">
-                  <img 
-                    src={ev.posterUrl || undefined}
-                    alt={ev.title}
-                    onError={(e) => { e.currentTarget.src = 'https://placehold.co/600x400/1a1b23/8792FF.png?text=Invalid+Image+URL'; e.currentTarget.onerror = null; }}
-                    className="absolute inset-0 w-full h-full object-contain"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f]/80 via-transparent to-transparent"></div>
-                  
-                  {/* Subtle Top Left: Event Title */}
-                  <div className="absolute top-3 left-3 bg-black/20 backdrop-blur-sm px-2.5 py-1 rounded-md flex items-center gap-1.5">
-                    <span className="text-white/90 text-[10px] font-medium">{ev.title}</span>
-                    <div className="w-1 h-1 rounded-full bg-white/30"></div>
-                    <span className="text-[#8792FF] text-[9px] font-bold">{tasks.filter(t => t.eventId === ev.id).length} Tasks</span>
-                  </div>
-                  
-                  {/* Subtle Top Right: Timer */}
-                  <div className="absolute top-3 right-3 flex items-center gap-1 bg-black/20 backdrop-blur-sm px-2 py-1 rounded-md">
-                    <Clock className="w-2.5 h-2.5 text-[#8792FF]/80" />
-                    <div className="flex items-center text-white/80 font-mono text-[9px] font-medium tracking-wide">
-                      <span>{String(tLeft.days).padStart(2, '0')}</span><span className="text-white/40 mx-[1px]">d</span>
-                      <span>{String(tLeft.hours).padStart(2, '0')}</span><span className="text-white/40 mx-[1px]">h</span>
-                      <span>{String(tLeft.mins).padStart(2, '0')}</span><span className="text-white/40 mx-[1px]">m</span>
-                      <span>{String(tLeft.secs).padStart(2, '0')}</span><span className="text-white/40 ml-[1px]">s</span>
-                    </div>
-                  </div>
-
-                  <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between">
-                    <div className="flex flex-col">
-                      <span className="text-white text-xl font-black drop-shadow-lg leading-tight whitespace-pre-wrap">{ev.rewardText}</span>
-                    </div>
-                    <button 
-                      onClick={() => {
-                        setSelectedEventId(ev.id);
-                        const firstCat = 'All';
-                        setActiveCategory(firstCat);
-                      }}
-                      className="bg-[#8792FF] hover:bg-[#727dee] text-white font-bold py-1.5 px-4 rounded-full active:scale-95 transition-transform shadow-[0_2px_8px_rgba(135,146,255,0.4)] flex items-center gap-1.5 text-[13px] shrink-0 ml-4"
-                    >
-                      Start <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
+                <button 
+                  key={ev.id}
+                  onClick={() => {
+                    setSelectedEventId(ev.id);
+                    setActiveCategory('All');
+                  }}
+                  className={`px-4 py-2 rounded-full text-[13px] font-semibold transition-all shrink-0 border ${isActive ? 'bg-[#8792FF]/20 text-[#8792FF] border-[#8792FF]/50 shadow-[0_4px_12px_rgba(135,146,255,0.15)]' : 'bg-white/5 text-white/50 border-white/5 hover:bg-white/10 hover:text-white'}`}
+                >
+                  {ev.title} ({eventTasksCount})
+                </button>
               );
             })}
-          </motion.div>
-        ) : (
-          <motion.div 
-            key="tasks"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col px-2 mt-2 pb-24"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <button 
-                onClick={() => setSelectedEventId(null)}
-                className="flex items-center gap-1.5 text-white/60 hover:text-white transition-colors text-[13px] font-semibold bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-full border border-white/5"
-              >
-                <ArrowRight className="w-3.5 h-3.5 rotate-180" /> Back
-              </button>
-              
-              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar mask-edges-right pb-2">
-                {['All', ...new Set(tasks.filter(t => t.eventId === selectedEventId).map(t => t.category || 'Other'))].map(cat => (
-                  <button 
-                    key={cat}
-                    onClick={() => setActiveCategory(cat as string)}
-                    className={`px-4 py-1.5 rounded-full text-[13px] font-semibold transition-all shrink-0 border ${activeCategory === cat ? 'bg-[#8792FF]/20 text-[#8792FF] border-[#8792FF]/50 shadow-[0_4px_12px_rgba(135,146,255,0.15)]' : 'bg-white/5 text-white/50 border-white/5 hover:bg-white/10 hover:text-white'}`}
-                  >
-                    {cat as string}
-                  </button>
-                ))}
-              </div>
+          </div>
+
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar mask-edges-right pb-2">
+              {['All', ...new Set(tasks.filter(t => t.eventId === (selectedEventId || events[0]?.id) || ((selectedEventId || events[0]?.id) === 'default' && (!t.eventId || t.eventId === 'default'))).map(t => t.category || 'Other'))].map(cat => (
+                <button 
+                  key={cat}
+                  onClick={() => setActiveCategory(cat as string)}
+                  className={`px-4 py-1.5 rounded-full text-[13px] font-semibold transition-all shrink-0 border ${activeCategory === cat ? 'bg-white/10 text-white border-white/20' : 'bg-transparent text-white/40 border-transparent hover:text-white/80'}`}
+                >
+                  {cat as string}
+                </button>
+              ))}
             </div>
+          </div>
 
-            {tasks.filter(t => t.eventId === selectedEventId && (activeCategory === 'All' || t.category === activeCategory)).length === 0 && (
-              <div className="text-center text-white/40 text-sm mt-8 py-8 border border-white/5 rounded-2xl bg-white/[0.02]">
-                No tasks available in this category.
-              </div>
-            )}
+          {tasks.filter(t => (t.eventId === (selectedEventId || events[0]?.id) || ((selectedEventId || events[0]?.id) === 'default' && (!t.eventId || t.eventId === 'default'))) && (activeCategory === 'All' || t.category === activeCategory)).length === 0 && (
+            <div className="text-center text-white/40 text-sm mt-8 py-8 border border-white/5 rounded-2xl bg-white/[0.02]">
+              No tasks available in this event.
+            </div>
+          )}
 
-            {tasks.filter(t => t.eventId === selectedEventId && (activeCategory === 'All' || t.category === activeCategory)).map((task) => {
-              const state = taskStates[task.id] || 'start';
-              const isVerifying = verifyingTasks[task.id];
-              const currentCountdown = taskCountdowns[task.id];
-              const isOpening = currentCountdown !== undefined;
+          {tasks.filter(t => (t.eventId === (selectedEventId || events[0]?.id) || ((selectedEventId || events[0]?.id) === 'default' && (!t.eventId || t.eventId === 'default'))) && (activeCategory === 'All' || t.category === activeCategory)).map((task) => {
+            const state = taskStates[task.id] || 'start';
+            const isVerifying = verifyingTasks[task.id];
+            const currentCountdown = taskCountdowns[task.id];
+            const isOpening = currentCountdown !== undefined;
               
               const getIcon = () => {
                 if (task.iconUrl) {
@@ -509,7 +449,6 @@ export function Rewards() {
               );
             })}
           </motion.div>
-        )}
       </AnimatePresence>
     </motion.div>
   );

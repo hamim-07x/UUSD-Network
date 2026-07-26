@@ -101,12 +101,62 @@ export async function verifyTwitterFollow(
   telegramId: string,
   taskLink: string
 ): Promise<VerifyResult> {
-  const username = extractTwitterUsername(taskLink);
-  if (!username) {
+  const targetUsername = extractTwitterUsername(taskLink);
+  if (!targetUsername) {
     return { ok: false, message: "Invalid Twitter/X link on this task." };
   }
 
-  return { ok: true, message: "Mocked Twitter verification in AI Studio" };
+  try {
+    const settingsSnap = await getDoc(doc(db, "settings", "api_keys"));
+    const twitterToken = settingsSnap.exists() ? settingsSnap.data().twitterBearerToken : null;
+    
+    if (!twitterToken) {
+      return { ok: false, message: "Verification system is not configured. Please contact admin." };
+    }
+
+    const userTwitter = window.prompt("To verify, please enter your Twitter/X username (e.g. @johndoe):");
+    if (!userTwitter) {
+       return { ok: false, message: "Twitter username is required for verification." };
+    }
+    const cleanUserTwitter = userTwitter.replace("@", "").trim();
+
+    // Use a CORS proxy for client-side API requests
+    const proxyUrl = "https://corsproxy.io/?";
+
+    // 1. Get user ID
+    const userUrl = encodeURIComponent(`https://api.twitter.com/2/users/by/username/${cleanUserTwitter}`);
+    const userRes = await fetch(`${proxyUrl}${userUrl}`, {
+       headers: { "Authorization": `Bearer ${twitterToken}` }
+    });
+    const userData = await userRes.json();
+    if (!userData.data) return { ok: false, message: "Could not find your Twitter account." };
+    const userId = userData.data.id;
+
+    // 2. Get target ID
+    const targetUrl = encodeURIComponent(`https://api.twitter.com/2/users/by/username/${targetUsername}`);
+    const targetRes = await fetch(`${proxyUrl}${targetUrl}`, {
+       headers: { "Authorization": `Bearer ${twitterToken}` }
+    });
+    const targetData = await targetRes.json();
+    if (!targetData.data) return { ok: false, message: "Could not find the target Twitter account." };
+    const targetId = targetData.data.id;
+
+    // 3. Check following
+    const followUrl = encodeURIComponent(`https://api.twitter.com/2/users/${userId}/following`);
+    const followRes = await fetch(`${proxyUrl}${followUrl}`, {
+       headers: { "Authorization": `Bearer ${twitterToken}` }
+    });
+    const followData = await followRes.json();
+    
+    if (followData.data && followData.data.some((u: any) => u.username.toLowerCase() === targetUsername.toLowerCase() || u.id === targetId)) {
+        return { ok: true };
+    } else {
+        return { ok: false, message: "You are not following the account yet." };
+    }
+  } catch (e) {
+    console.error("verifyTwitterFollow error", e);
+    return { ok: false, message: "Verification failed due to a network or CORS error." };
+  }
 }
 
 function extractTelegramChat(link: string): string | null {
