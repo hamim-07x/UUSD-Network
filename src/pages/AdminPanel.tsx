@@ -69,7 +69,6 @@ export function AdminPanel() {
   const [contentMsg, setContentMsg] = useState("");
 
   // Task form
-  const [taskEventFilter, setTaskEventFilter] = useState<string>("all");
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [taskForm, setTaskForm] = useState({
@@ -634,32 +633,8 @@ export function AdminPanel() {
                   </div>
                 )}
 
-                <div className="flex items-center gap-2 overflow-x-auto no-scrollbar mask-edges-right pb-2">
-                  <button 
-                    onClick={() => setTaskEventFilter("all")}
-                    className={`px-4 py-1.5 rounded-full text-[13px] font-semibold transition-all shrink-0 border ${taskEventFilter === "all" ? 'bg-[#8792FF]/20 text-[#8792FF] border-[#8792FF]/50 shadow-[0_4px_12px_rgba(135,146,255,0.15)]' : 'bg-white/5 text-white/50 border-white/5 hover:bg-white/10 hover:text-white'}`}
-                  >
-                    All Tasks
-                  </button>
-                  <button 
-                    onClick={() => setTaskEventFilter("default")}
-                    className={`px-4 py-1.5 rounded-full text-[13px] font-semibold transition-all shrink-0 border ${taskEventFilter === "default" ? 'bg-[#8792FF]/20 text-[#8792FF] border-[#8792FF]/50 shadow-[0_4px_12px_rgba(135,146,255,0.15)]' : 'bg-white/5 text-white/50 border-white/5 hover:bg-white/10 hover:text-white'}`}
-                  >
-                    Default (No Event)
-                  </button>
-                  {events.map(ev => (
-                    <button 
-                      key={ev.id}
-                      onClick={() => setTaskEventFilter(ev.id)}
-                      className={`px-4 py-1.5 rounded-full text-[13px] font-semibold transition-all shrink-0 border ${taskEventFilter === ev.id ? 'bg-[#8792FF]/20 text-[#8792FF] border-[#8792FF]/50 shadow-[0_4px_12px_rgba(135,146,255,0.15)]' : 'bg-white/5 text-white/50 border-white/5 hover:bg-white/10 hover:text-white'}`}
-                    >
-                      {ev.title}
-                    </button>
-                  ))}
-                </div>
-
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                  {tasks.filter(t => taskEventFilter === "all" || (taskEventFilter === "default" && (!t.eventId || t.eventId === "default")) || t.eventId === taskEventFilter).map(task => (
+                  {tasks.map(task => (
                     <div key={task.id} className="bg-[#16171f] border border-white/5 rounded-2xl p-5 relative group">
                       <div className="absolute top-3 right-3 flex gap-1 opacity-70 group-hover:opacity-100">
                         <button onClick={() => {
