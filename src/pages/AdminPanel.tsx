@@ -605,6 +605,7 @@ export function AdminPanel() {
                       )}
                       <select value={taskForm.eventId} onChange={e => setTaskForm({ ...taskForm, eventId: e.target.value })}
                         className="bg-[#0c0d12] border border-white/10 rounded-xl px-3 py-2 text-sm focus:border-[#8792FF] outline-none">
+                        <option value="default">Default (No Event)</option>
                         {events.map(ev => <option key={ev.id} value={ev.id}>{ev.title}</option>)}
                       </select>
                       {taskForm.category === "Referral" && (
@@ -656,8 +657,13 @@ export function AdminPanel() {
                       </div>
                       <h4 className="font-bold mb-1 pr-12">{task.title}</h4>
                       <p className="text-xs text-white/40 mb-2">{task.description}</p>
-                      <div className="flex gap-2 flex-wrap">
+                      <div className="flex gap-2 flex-wrap mt-2">
                         <span className="text-[10px] uppercase bg-white/5 px-2 py-0.5 rounded text-white/40">{task.category || "General"}</span>
+                        {task.eventId && task.eventId !== "default" && (
+                          <span className="text-[10px] uppercase bg-[#8792FF]/10 px-2 py-0.5 rounded text-[#8792FF]">
+                            Event: {events.find(e => e.id === task.eventId)?.title || "Unknown"}
+                          </span>
+                        )}
                         {task.link && <span className="text-[10px] text-blue-400 truncate max-w-[140px]">{task.link}</span>}
                       </div>
                     </div>

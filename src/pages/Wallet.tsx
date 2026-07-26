@@ -295,9 +295,10 @@ export function Wallet() {
                 ))}
               </div>
 
-              <AnimatePresence>
-                {filteredActivities && filteredActivities.length > 0 ? (
-                filteredActivities.map((activity, index) => {
+              <AnimatePresence mode="popLayout">
+                {filteredActivities.length > 0 ? (
+                  <motion.div key="activity-list" className="flex flex-col w-full">
+                    {filteredActivities.map((activity, index) => {
                   const token = TOKENS.find(t => t.symbol === activity.symbol);
                   const dollarValue = (activity.amount * (token?.price || 0)).toFixed(2);
                   const { title, isPositive, ActionIcon, iconColor, iconBg } = getActivityDetails(activity);
@@ -335,9 +336,11 @@ export function Wallet() {
                       </div>
                     </div>
                   );
-                })
+                })}
+              </motion.div>
               ) : (
                 <motion.div 
+                  key="activity-empty"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   className="flex flex-col items-center justify-center py-12 px-4"
@@ -356,10 +359,10 @@ export function Wallet() {
       
       {/* Activity Details Modal */}
       <AnimatePresence>
-        {selectedActivity && (() => {
+        {selectedActivity ? (() => {
           const { title, isPositive, ActionIcon, iconColor, iconBg } = getActivityDetails(selectedActivity);
           return (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div key="activity-modal" className="fixed inset-0 z-[100] flex items-center justify-center p-4">
               <motion.div 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -415,7 +418,7 @@ export function Wallet() {
               </motion.div>
             </div>
           );
-        })()}
+        })() : null}
       </AnimatePresence>
     </motion.div>
   );
