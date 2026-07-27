@@ -58,6 +58,8 @@ export function useWallet(telegramUser: TelegramUser | null) {
       return;
     }
 
+    setIsLoading(true);
+
     let unsubWallet: () => void;
     let unsubActivities: () => void;
 
@@ -178,7 +180,6 @@ export function useWallet(telegramUser: TelegramUser | null) {
       const storageKey = `${MOCK_WALLET_KEY}${telegramId}`;
       localStorage.setItem(storageKey, JSON.stringify(newWallet));
       setWallet(newWallet);
-      setNeedsCreation(false);
 
       const walletRef = doc(db, "wallets", telegramId);
       try {
@@ -186,6 +187,8 @@ export function useWallet(telegramUser: TelegramUser | null) {
       } catch (err: any) {
         console.error("Firebase save failed, but local created", err);
       }
+
+      setNeedsCreation(false);
 
       const registryEntry: UserRegistryEntry = {
         telegramId,
