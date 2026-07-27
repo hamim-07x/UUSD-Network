@@ -70,6 +70,7 @@ export function AdminPanel() {
 
   // Task form
   const [isAddingTask, setIsAddingTask] = useState(false);
+  const [taskFilter, setTaskFilter] = useState("all");
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [taskForm, setTaskForm] = useState({
     title: "", description: "", reward: 1, link: "", iconType: "twitter",
@@ -568,6 +569,20 @@ export function AdminPanel() {
                   </button>
                 </div>
 
+                <div className="flex overflow-x-auto gap-2 pb-2 scrollbar-none">
+                  <button onClick={() => setTaskFilter("all")} className={`px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors ${taskFilter === "all" ? "bg-[#8792FF] text-white" : "bg-white/5 text-white/50 hover:bg-white/10"}`}>
+                    All Tasks ({tasks.length})
+                  </button>
+                  {events.map(ev => {
+                    const count = tasks.filter(t => t.eventId === ev.id).length;
+                    return (
+                      <button key={ev.id} onClick={() => setTaskFilter(ev.id)} className={`px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors ${taskFilter === ev.id ? "bg-[#8792FF] text-white" : "bg-white/5 text-white/50 hover:bg-white/10"}`}>
+                        {ev.title} ({count})
+                      </button>
+                    )
+                  })}
+                </div>
+
                 {isAddingTask && (
                   <div className="bg-[#16171f] border border-white/10 rounded-2xl p-5 space-y-3">
                     <h3 className="font-semibold text-sm">{editingTaskId ? "Edit Task" : "New Task"}</h3>
@@ -634,7 +649,7 @@ export function AdminPanel() {
                 )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                  {tasks.map(task => (
+                  {tasks.filter(t => taskFilter === "all" || t.eventId === taskFilter).map(task => (
                     <div key={task.id} className="bg-[#16171f] border border-white/5 rounded-2xl p-5 relative group">
                       <div className="absolute top-3 right-3 flex gap-1 opacity-70 group-hover:opacity-100">
                         <button onClick={() => {
@@ -738,7 +753,22 @@ export function AdminPanel() {
                         )}
                       </div>
                       <div className="flex-1 pr-10">
-                        <h3 className="text-lg font-bold mb-1">{ev.title}</h3>
+                        <div className="flex justify-between items-start mb-1">
+                          <h3 className="text-lg font-bold">{ev.title}</h3>
+                          <label className="flex items-center gap-2 cursor-pointer mt-1">
+                            <span className="text-[10px] text-white/50 font-bold uppercase tracking-wider">End</span>
+                            <div className="relative">
+                              <input type="checkbox" className="sr-only peer" checked={ev.isEnded || false}
+                                onChange={async (e) => {
+                                  const updated = { ...ev, isEnded: e.target.checked };
+                                  if (e.target.checked) updated.durationDays = 0;
+                                  await saveEvent(updated);
+                                  setEvents(prev => prev.map(evt => evt.id === ev.id ? updated : evt));
+                                }} />
+                              <div className="w-7 h-4 bg-white/20 rounded-full peer peer-checked:bg-red-500 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all"></div>
+                            </div>
+                          </label>
+                        </div>
                         <p className="text-xs text-white/40 mb-3">Category: {ev.category || "General"} · {ev.durationDays || 0} days · {tasks.filter(t => t.eventId === ev.id).length} tasks</p>
                         <div className="bg-white/5 rounded-xl p-3 text-sm whitespace-pre-wrap">{ev.rewardText}</div>
                       </div>

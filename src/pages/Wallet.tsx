@@ -47,16 +47,6 @@ export function Wallet() {
     return () => clearInterval(interval);
   }, []);
 
-  // Wallet creation is handled by AppLayout gate.
-  // If we somehow land here without a wallet, show a minimal wait state.
-  if (needsCreation) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[70vh] p-4 text-center">
-        <WalletIcon className="w-12 h-12 text-[#8792FF] mb-4 animate-pulse" />
-        <p className="text-white/60 text-sm">Preparing your wallet...</p>
-      </div>
-    );
-  }
 
   const balances = fullWallet?.balances || {};
   let totalBalance = 0;
@@ -123,6 +113,18 @@ export function Wallet() {
       return true;
     });
   }, [activities, activityFilter]);
+
+  // Wallet creation is handled by AppLayout gate.
+  // If we somehow land here without a wallet, show a minimal wait state.
+  if (needsCreation) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[70vh] p-4 text-center">
+        <WalletIcon className="w-12 h-12 text-[#8792FF] mb-4 animate-pulse" />
+        <p className="text-white/60 text-sm">Preparing your wallet...</p>
+      </div>
+    );
+  }
+
 
   const handleCopy = () => {
     if (!address) return;

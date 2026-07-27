@@ -363,9 +363,17 @@ export function Rewards() {
                     src={ev.posterUrl || undefined}
                     alt={ev.title}
                     onError={(e) => { e.currentTarget.src = 'https://placehold.co/600x400/1a1b23/8792FF.png?text=Invalid+Image+URL'; e.currentTarget.onerror = null; }}
-                    className="absolute inset-0 w-full h-full object-contain"
+                    className={`absolute inset-0 w-full h-full object-contain ${ev.isEnded ? 'opacity-50 grayscale-[50%]' : ''}`}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f]/80 via-transparent to-transparent"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f]/90 via-[#0a0a0f]/20 to-transparent"></div>
+                  
+                  {ev.isEnded && (
+                    <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] z-10 flex items-center justify-center">
+                      <div className="bg-red-500/90 text-white font-black text-2xl px-6 py-2 rounded-xl rotate-[-5deg] border-2 border-red-400/50 shadow-2xl tracking-widest shadow-red-500/20">
+                        FINISHED
+                      </div>
+                    </div>
+                  )}
                   
                   {/* Subtle Top Left: Event Title */}
                   <div className="absolute top-3 left-3 bg-black/20 backdrop-blur-sm px-2.5 py-1 rounded-md flex items-center gap-1.5">
@@ -375,30 +383,38 @@ export function Rewards() {
                   </div>
                   
                   {/* Subtle Top Right: Timer */}
-                  <div className="absolute top-3 right-3 flex items-center gap-1 bg-black/20 backdrop-blur-sm px-2 py-1 rounded-md">
-                    <Clock className="w-2.5 h-2.5 text-[#8792FF]/80" />
-                    <div className="flex items-center text-white/80 font-mono text-[9px] font-medium tracking-wide">
-                      <span>{String(tLeft.days).padStart(2, '0')}</span><span className="text-white/40 mx-[1px]">d</span>
-                      <span>{String(tLeft.hours).padStart(2, '0')}</span><span className="text-white/40 mx-[1px]">h</span>
-                      <span>{String(tLeft.mins).padStart(2, '0')}</span><span className="text-white/40 mx-[1px]">m</span>
-                      <span>{String(tLeft.secs).padStart(2, '0')}</span><span className="text-white/40 ml-[1px]">s</span>
-                    </div>
+                  <div className="absolute top-3 right-3 flex items-center gap-1 bg-black/20 backdrop-blur-sm px-2 py-1 rounded-md z-20">
+                    {ev.isEnded ? (
+                      <span className="text-red-400 font-bold text-[9px] tracking-widest uppercase">FINISHED</span>
+                    ) : (
+                      <>
+                        <Clock className="w-2.5 h-2.5 text-[#8792FF]/80" />
+                        <div className="flex items-center text-white/80 font-mono text-[9px] font-medium tracking-wide">
+                          <span>{String(tLeft.days).padStart(2, '0')}</span><span className="text-white/40 mx-[1px]">d</span>
+                          <span>{String(tLeft.hours).padStart(2, '0')}</span><span className="text-white/40 mx-[1px]">h</span>
+                          <span>{String(tLeft.mins).padStart(2, '0')}</span><span className="text-white/40 mx-[1px]">m</span>
+                          <span>{String(tLeft.secs).padStart(2, '0')}</span><span className="text-white/40 ml-[1px]">s</span>
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between">
                     <div className="flex flex-col">
                       <span className="text-white text-xl font-black drop-shadow-lg leading-tight whitespace-pre-wrap">{ev.rewardText}</span>
                     </div>
+                    {!ev.isEnded && (
                     <button 
                       onClick={() => {
                         setSelectedEventId(ev.id);
                         const firstCat = 'All';
                         setActiveCategory(firstCat);
                       }}
-                      className="bg-[#8792FF] hover:bg-[#727dee] text-white font-bold py-1.5 px-4 rounded-full active:scale-95 transition-transform shadow-[0_2px_8px_rgba(135,146,255,0.4)] flex items-center gap-1.5 text-[13px] shrink-0 ml-4"
+                      className="bg-[#8792FF] hover:bg-[#727dee] text-white font-bold py-1.5 px-4 rounded-full active:scale-95 transition-transform shadow-[0_2px_8px_rgba(135,146,255,0.4)] flex items-center gap-1.5 text-[13px] shrink-0 ml-4 z-20"
                     >
                       Start <ArrowRight className="w-3.5 h-3.5" />
                     </button>
+                    )}
                   </div>
                 </div>
               );
