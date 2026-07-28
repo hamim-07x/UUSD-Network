@@ -13,6 +13,8 @@ import { useTelegramUser } from "../hooks/useTelegramUser";
 import { findUserByAddress, transferFunds } from "../lib/db";
 import { hasPinSet } from "../lib/pin";
 import { PinModal } from "../components/ui/PinModal";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../lib/firebase";
 import { useSettings } from "../lib/SettingsContext";
 
 const UUSD_TOKEN = {
@@ -46,10 +48,24 @@ export function Withdraw() {
   const [pinOpen, setPinOpen] = useState(false);
   const [pinMode, setPinMode] = useState<"setup" | "verify">("verify");
   const [pendingSend, setPendingSend] = useState(false);
+  const [minTransferAmount, setMinTransferAmount] = useState(0);
 
   const availableAmount = balances[UUSD_TOKEN.symbol] || 0;
   const parsedAmount = parseFloat(amount) || 0;
   const telegramId = fullWallet?.telegramId || telegramUser.telegramId || "";
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const snap = await getDoc(doc(db, "settings", "global"));
+        if (snap.exists()) {
+          const m = snap.data().minTransferAmount;
+          if (m !== undefined) setMinTransferAmount(Number(m));
+        }
+      } catch (e) {}
+    };
+    fetchSettings();
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -120,6 +136,10 @@ export function Withdraw() {
 
   const handleWithdraw = async () => {
     if (parsedAmount <= 0 || parsedAmount > availableAmount || !address || !recipientData || !fullWallet) return;
+    if (parsedAmount < minTransferAmount) {
+      alert(`The minimum transfer amount is ${minTransferAmount} UUSD`);
+      return;
+    }
     if (!telegramId) return;
 
     // Require PIN set + verify before processing
@@ -274,12 +294,15 @@ export function Withdraw() {
               placeholder="0"
               className="w-full bg-transparent border-none outline-none text-[20px] font-semibold placeholder:text-white/20"
             />
-            <button
-              onClick={handleMax}
-              className="text-[#8792FF] text-[13px] font-bold px-3 py-1.5 rounded-lg bg-[#8792FF]/10 hover:bg-[#8792FF]/20 transition-colors"
-            >
-              MAX
-            </button>
+            <div className="flex items-center gap-2">
+              {minTransferAmount > 0 && <span className="text-[10px] text-white/40">Min: {minTransferAmount}</span>}
+              <button
+                onClick={handleMax}
+                className="text-[#8792FF] text-[13px] font-bold px-3 py-1.5 rounded-lg bg-[#8792FF]/10 hover:bg-[#8792FF]/20 transition-colors"
+              >
+                MAX
+              </button>
+            </div>
           </div>
         </div>
 

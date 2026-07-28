@@ -19,7 +19,7 @@ export function AppLayout() {
   const location = useLocation();
   const outlet = useOutlet();
   const telegramUser = useTelegramUser();
-  const { isLoading: isWalletLoading, needsCreation, isCreating, createWallet } = useWallet(telegramUser);
+  const { isLoading: isWalletLoading, needsCreation, isCreating, createWallet, fullWallet } = useWallet(telegramUser);
   const [isInitializing, setIsInitializing] = useState(true);
   const [minTimeDone, setMinTimeDone] = useState(false);
 
@@ -135,19 +135,35 @@ export function AppLayout() {
           <div className="min-h-screen w-full flex flex-col pt-[env(safe-area-inset-top)] pb-[calc(6rem+env(safe-area-inset-bottom))] text-white font-sans selection:bg-blue-500/30">
             <main className="flex-1 w-full max-w-md mx-auto relative px-4 pt-4 z-0">
               <AnimatePresence mode="wait">
-                <motion.div
-                  key={location.pathname}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3, ease: "easeOut" }}
-                  className="w-full h-full"
-                >
-                  {outlet}
-                </motion.div>
+                {fullWallet?.blocked ? (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex flex-col items-center justify-center h-[70vh] text-center"
+                  >
+                    <div className="w-16 h-16 bg-red-500/20 text-red-400 rounded-2xl flex items-center justify-center mb-4 border border-red-500/30 shadow-[0_0_20px_rgba(239,68,68,0.2)]">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                    </div>
+                    <h2 className="text-xl font-bold text-red-400 mb-2">Account Blocked</h2>
+                    <p className="text-white/60 text-sm max-w-[250px] leading-relaxed">
+                      Your account has been restricted by the administrator. Contact support if you believe this is a mistake.
+                    </p>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key={location.pathname}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                    className="w-full h-full"
+                  >
+                    {outlet}
+                  </motion.div>
+                )}
               </AnimatePresence>
             </main>
-            <BottomNav />
+            {!fullWallet?.blocked && <BottomNav />}
           </div>
         )}
       </>

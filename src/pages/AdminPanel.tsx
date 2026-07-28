@@ -57,6 +57,7 @@ export function AdminPanel() {
   // Settings
   const [botUsername, setBotUsername] = useState(localStorage.getItem("mock_bot_username") || "our_bot");
   const [supportUsername, setSupportUsername] = useState(localStorage.getItem("mock_support_username") || "support");
+  const [minTransferAmount, setMinTransferAmount] = useState(localStorage.getItem("mock_min_transfer") || "10");
   const [telegramBotToken, setTelegramBotToken] = useState("");
   const [twitterBearerToken, setTwitterBearerToken] = useState("");
   const [apiSaveMsg, setApiSaveMsg] = useState("");
@@ -153,6 +154,7 @@ export function AdminPanel() {
           const g = globalSnap.data();
           if (g.botUsername) setBotUsername(g.botUsername);
           if (g.supportUsername) setSupportUsername(g.supportUsername);
+          if (g.minTransferAmount !== undefined) setMinTransferAmount(String(g.minTransferAmount));
         }
         const apiSnap = await getDoc(doc(db, "settings", "api_keys"));
         if (apiSnap.exists()) {
@@ -312,6 +314,7 @@ export function AdminPanel() {
       await setDoc(doc(db, "settings", "global"), {
         botUsername: botUsername.trim(),
         supportUsername: supportUsername.trim(),
+        minTransferAmount: Number(minTransferAmount) || 0,
         updatedAt: new Date().toISOString(),
       }, { merge: true });
 
@@ -325,6 +328,7 @@ export function AdminPanel() {
       try {
         localStorage.setItem("mock_bot_username", botUsername.trim());
         localStorage.setItem("mock_support_username", supportUsername.trim());
+        localStorage.setItem("mock_min_transfer", String(Number(minTransferAmount) || 0));
       } catch (_) {}
 
       setApiSaveMsg("Settings saved to Firebase. API tokens will be used by Cloud Functions for verification.");
@@ -916,6 +920,14 @@ export function AdminPanel() {
                       <span className="text-white/30">@</span>
                       <input value={botUsername} onChange={e => setBotUsername(e.target.value.replace("@", ""))}
                         className="flex-1 bg-[#0c0d12] border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:border-[#8792FF] outline-none" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs text-white/50 mb-1.5 block">Min Transfer/Withdraw Amount</label>
+                    <div className="flex items-center gap-2">
+                      <input type="number" min="0" value={minTransferAmount} onChange={e => setMinTransferAmount(e.target.value)}
+                        className="flex-1 bg-[#0c0d12] border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:border-[#8792FF] outline-none" />
+                      <span className="text-white/30 text-xs">UUSD</span>
                     </div>
                   </div>
                   <div>

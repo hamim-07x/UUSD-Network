@@ -204,7 +204,7 @@ export function Profile() {
         <div className="bg-white/[0.04] backdrop-blur-2xl border border-white/[0.05] shadow-[0_8px_32px_rgba(0,0,0,0.2)] rounded-3xl p-4">
           <h3 className="text-[14px] font-semibold text-[#8792FF] mb-2 px-1">{t('General settings')}</h3>
           <div className="flex flex-col">
-            <SettingsItem icon={Bell} label={t('Notifications')} value={settings.notifications ? "On" : "Off"} colorClass="bg-[#FF4B4B]" onClick={() => updateSettings({ notifications: !settings.notifications })} />
+            <SettingsItem icon={Bell} label={t('Notifications')} value={settings.notifications ? "On" : "Off"} colorClass="bg-[#FF4B4B]" onClick={() => navigate("/notifications")} />
             <SettingsItem icon={Lock} label={t('Passcode')} value={pinSet ? "On" : "Off"} colorClass="bg-[#2D8CFF]" onClick={() => {
               if (pinSet) {
                 setPinMode("reset");

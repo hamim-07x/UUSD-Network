@@ -6,6 +6,7 @@ export interface UserWallet {
   lockedBalance: number;
   balances?: Record<string, number>;
   depositEnabled: boolean;
+  blocked?: boolean;
 }
 
 export interface Transaction {

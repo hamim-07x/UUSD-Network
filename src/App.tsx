@@ -23,6 +23,7 @@ import { DeFiAccountFAQ } from './pages/DeFiAccountFAQ';
 import { WalletNewsPage } from './pages/WalletNewsPage';
 import { Language } from './pages/Language';
 import { DefaultCurrency } from './pages/DefaultCurrency';
+import { Notifications } from './pages/Notifications';
 
 export default function App() {
   return (
@@ -40,6 +41,7 @@ export default function App() {
           <Route path="/faq" element={<DeFiAccountFAQ />} />
           <Route path="/news" element={<WalletNewsPage />} />
           <Route path="/language" element={<Language />} />
+          <Route path="/notifications" element={<Notifications />} />
           <Route path="/currency" element={<DefaultCurrency />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
