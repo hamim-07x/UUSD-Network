@@ -212,7 +212,7 @@ export function Withdraw() {
         {/* Address */}
         <div className="flex flex-col gap-2">
           <label className="text-[14px] font-medium text-white/70">Recipient address</label>
-          <div className="flex items-center gap-2 p-3 rounded-[16px] bg-[#1a1b23] border border-white/5 focus-within:border-[#8792FF]/50 transition-colors">
+          <div className="flex items-center gap-2 p-3 rounded-2xl bg-white/[0.04] backdrop-blur-2xl border border-white/[0.05] focus-within:border-[#8792FF]/50 transition-colors shadow-[0_8px_32px_rgba(0,0,0,0.2)]">
             <input
               type="text"
               value={address}
@@ -258,7 +258,7 @@ export function Withdraw() {
         {/* Network */}
         <div className="flex flex-col gap-2">
           <label className="text-[14px] font-medium text-white/70">Network</label>
-          <div className="flex items-center p-3 rounded-[16px] bg-[#1a1b23] border border-white/5 opacity-80 gap-3">
+          <div className="flex items-center p-3 rounded-2xl bg-white/[0.04] backdrop-blur-2xl border border-white/[0.05] opacity-80 gap-3 shadow-[0_8px_32px_rgba(0,0,0,0.2)]">
             <img src={BSC_NETWORK.icon} alt="" className="w-6 h-6 rounded-full" />
             <span className="text-[15px] font-medium">{BSC_NETWORK.name}</span>
           </div>
@@ -267,7 +267,7 @@ export function Withdraw() {
         {/* Asset */}
         <div className="flex flex-col gap-2">
           <label className="text-[14px] font-medium text-white/70">Asset</label>
-          <div className="flex items-center p-3 rounded-[16px] bg-[#1a1b23] border border-white/5 opacity-80">
+          <div className="flex items-center p-3 rounded-2xl bg-white/[0.04] backdrop-blur-2xl border border-white/[0.05] opacity-80 shadow-[0_8px_32px_rgba(0,0,0,0.2)]">
             <div className="flex items-center gap-3">
               <img src={UUSD_TOKEN.imgUrl} alt={UUSD_TOKEN.name} className="w-6 h-6 rounded-full" />
               <div className="flex flex-col">
@@ -286,7 +286,7 @@ export function Withdraw() {
               Available: {availableAmount} {UUSD_TOKEN.symbol}
             </span>
           </div>
-          <div className="flex items-center p-3 rounded-[16px] bg-[#1a1b23] border border-white/5 focus-within:border-[#8792FF]/50 transition-colors">
+          <div className="flex items-center p-3 rounded-2xl bg-white/[0.04] backdrop-blur-2xl border border-white/[0.05] focus-within:border-[#8792FF]/50 transition-colors shadow-[0_8px_32px_rgba(0,0,0,0.2)]">
             <input
               type="number"
               value={amount}

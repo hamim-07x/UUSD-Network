@@ -248,9 +248,6 @@ export function Rewards() {
       }
 
       let finalReward = Number(task.reward) || 0;
-      if (isReferral) {
-        finalReward = finalReward * (task.requiredReferrals || 1);
-      }
 
       await addActivity("earn", finalReward, "UUSD", { toName: task.title });
 

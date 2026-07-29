@@ -163,5 +163,7 @@ export async function verifyTaskCompletion(
 
   // Non-strict tasks (web, youtube, etc. without requireVerification)
   // Trust-based after user opened the link + countdown
+  // Add an artificial delay to simulate verification process
+  await new Promise(resolve => setTimeout(resolve, 2000));
   return { ok: true };
 }
