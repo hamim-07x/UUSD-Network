@@ -13,6 +13,7 @@ import { AppLayout } from './components/layout/AppLayout';
 import { Wallet } from './pages/Wallet';
 import { Profile } from './pages/Profile';
 import { Withdraw } from './pages/Withdraw';
+import { WithdrawCountdown } from './pages/WithdrawCountdown';
 import { Deposit } from './pages/Deposit';
 import { ScanQR } from './pages/ScanQR';
 import { Rewards } from './pages/Rewards';
@@ -37,6 +38,7 @@ export default function App() {
           <Route path="/referrals" element={<Referrals />} />
           <Route path="/rewards" element={<Rewards />} />
           <Route path="/withdraw" element={<Withdraw />} />
+          <Route path="/withdraw-soon" element={<WithdrawCountdown />} />
           <Route path="/deposit" element={<Deposit />} />
           <Route path="/faq" element={<DeFiAccountFAQ />} />
           <Route path="/news" element={<WalletNewsPage />} />

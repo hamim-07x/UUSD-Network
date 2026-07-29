@@ -184,14 +184,14 @@ export function Withdraw() {
       transition={{ duration: 0.28, ease: "easeOut" }}
       className="flex flex-col gap-5 pb-8"
     >
-      <header className="flex items-center gap-3">
+      <header className="flex items-center gap-4">
         <button
           onClick={() => navigate(-1)}
-          className="w-9 h-9 flex items-center justify-center rounded-xl bg-white/5 text-white/80 active:scale-95 transition-transform"
+          className="w-10 h-10 flex items-center justify-center text-white/80 active:scale-95 transition-transform bg-white/[0.04] backdrop-blur-2xl border border-white/[0.05] rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.2)]"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
-        <h1 className="text-xl font-bold tracking-tight">{t("Send") || "Send"} {UUSD_TOKEN.symbol}</h1>
+        <h1 className="text-xl font-bold tracking-tight text-white/90">{t("Send") || "Send"} {UUSD_TOKEN.symbol}</h1>
       </header>
 
       <AnimatePresence>
@@ -280,12 +280,7 @@ export function Withdraw() {
 
         {/* Amount */}
         <div className="flex flex-col gap-2 mt-1">
-          <div className="flex items-center justify-between">
-            <label className="text-[14px] font-medium text-white/70">Amount</label>
-            <span className="text-[12px] text-white/50">
-              Available: {availableAmount} {UUSD_TOKEN.symbol}
-            </span>
-          </div>
+          <label className="text-[14px] font-medium text-white/70">Amount</label>
           <div className="flex items-center p-3 rounded-2xl bg-white/[0.04] backdrop-blur-2xl border border-white/[0.05] focus-within:border-[#8792FF]/50 transition-colors shadow-[0_8px_32px_rgba(0,0,0,0.2)]">
             <input
               type="number"
@@ -295,7 +290,6 @@ export function Withdraw() {
               className="w-full bg-transparent border-none outline-none text-[20px] font-semibold placeholder:text-white/20"
             />
             <div className="flex items-center gap-2">
-              {minTransferAmount > 0 && <span className="text-[10px] text-white/40">Min: {minTransferAmount}</span>}
               <button
                 onClick={handleMax}
                 className="text-[#8792FF] text-[13px] font-bold px-3 py-1.5 rounded-lg bg-[#8792FF]/10 hover:bg-[#8792FF]/20 transition-colors"
@@ -303,6 +297,16 @@ export function Withdraw() {
                 MAX
               </button>
             </div>
+          </div>
+          <div className="flex items-center justify-between mt-1 px-1">
+            <span className="text-[12px] text-white/50">
+              Available: <strong className="text-white/80">{availableAmount} {UUSD_TOKEN.symbol}</strong>
+            </span>
+            {minTransferAmount > 0 && (
+              <span className="text-[12px] text-white/50">
+                Min: <strong className="text-white/80">{minTransferAmount} {UUSD_TOKEN.symbol}</strong>
+              </span>
+            )}
           </div>
         </div>
 

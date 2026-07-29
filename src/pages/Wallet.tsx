@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Copy, Check, Send, Plus, ArrowUp, ArrowDown, ScanLine, Wallet as WalletIcon, Settings, ArrowDownLeft, ArrowUpRight, Gift, Clock, XCircle, CheckCircle2 } from "lucide-react";
+import { Copy, Check, Send, Plus, ArrowUp, ArrowDown, ScanLine, Wallet as WalletIcon, Settings, ArrowDownLeft, ArrowUpRight, Gift, Clock, XCircle, CheckCircle2, ArrowLeftRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTelegramUser } from "../hooks/useTelegramUser";
 import { useWallet } from "../hooks/useWallet";
@@ -223,7 +223,8 @@ export function Wallet() {
       <div className="flex justify-center gap-6 mb-8 px-2">
         <ActionButton icon={Send} label={t("Send")} onClick={() => navigate("/withdraw")} />
         <ActionButton icon={ArrowDown} label={t("Receive")} onClick={() => navigate("/deposit")} />
-        <ActionButton icon={ArrowUp} label={t("Withdraw")} onClick={() => alert("Withdrawal coming soon")} />
+        <ActionButton icon={ArrowUp} label={t("Withdraw")} onClick={() => navigate("/withdraw-soon")} />
+        <ActionButton icon={ArrowLeftRight} label={t("Trade")} onClick={() => alert("Trade coming soon")} />
       </div>
 
       {/* Tabs */}

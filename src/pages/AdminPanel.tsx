@@ -228,7 +228,7 @@ export function AdminPanel() {
   const handleSaveTask = async () => {
     if (!taskForm.title.trim()) return;
     const id = editingTaskId || `task_${Date.now()}`;
-    const task = { ...taskForm, id, reward: Number(taskForm.reward) || 0 };
+    const task = { ...taskForm, id, reward: Number(taskForm.reward) || 0, requiredReferrals: Number(taskForm.requiredReferrals) || 1 };
     try {
       await saveTask(task);
       if (editingTaskId) {
@@ -593,7 +593,7 @@ export function AdminPanel() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <input placeholder="Title" value={taskForm.title} onChange={e => setTaskForm({ ...taskForm, title: e.target.value })}
                         className="bg-[#0c0d12] border border-white/10 rounded-xl px-3 py-2 text-sm focus:border-[#8792FF] outline-none" />
-                      <input type="number" placeholder="Reward (UUSD)" value={taskForm.reward} onChange={e => setTaskForm({ ...taskForm, reward: Number(e.target.value) })}
+                      <input type="number" step="any" placeholder="Reward (UUSD)" value={taskForm.reward} onChange={e => setTaskForm({ ...taskForm, reward: e.target.value })}
                         className="bg-[#0c0d12] border border-white/10 rounded-xl px-3 py-2 text-sm focus:border-[#8792FF] outline-none" />
                       <input placeholder="Description" value={taskForm.description} onChange={e => setTaskForm({ ...taskForm, description: e.target.value })}
                         className="bg-[#0c0d12] border border-white/10 rounded-xl px-3 py-2 text-sm focus:border-[#8792FF] outline-none sm:col-span-2" />
@@ -627,7 +627,7 @@ export function AdminPanel() {
                         <option value="default">Default (No Event)</option>
                         {events.map(ev => <option key={ev.id} value={ev.id}>{ev.title}</option>)}
                       </select>
-                      {taskForm.category === "Referral" && (
+                      {(taskForm.category === "Referral" || taskForm.iconType === "referral") && (
                         <input type="number" placeholder="Required Referrals" value={taskForm.requiredReferrals}
                           onChange={e => setTaskForm({ ...taskForm, requiredReferrals: Number(e.target.value) })}
                           className="bg-[#0c0d12] border border-white/10 rounded-xl px-3 py-2 text-sm focus:border-[#8792FF] outline-none" />

@@ -489,7 +489,7 @@ export function Rewards() {
                         </div>
                         <div className="flex items-center gap-1">
                           <img src={rewardToken?.imgUrl || undefined} alt="Reward" className="w-3.5 h-3.5 rounded-full object-cover shadow-sm" />
-                          <span className="text-[12px] font-extrabold text-[#8792FF]">{(task.category === 'Referral' ? (task.reward * (task.requiredReferrals || 1)) : task.reward).toFixed(2)} $UUSD</span>
+                          <span className="text-[12px] font-extrabold text-[#8792FF]">{Number(task.reward).toFixed(2)} $UUSD</span>
                         </div>
                       </div>
                     </div>
