@@ -28,21 +28,7 @@ export async function getReferralCount(referrerId: string): Promise<number> {
   try {
     const q = query(collection(db, "referrals"), where("referrerId", "==", referrerId));
     const snap = await getDocs(q);
-    
-    let qualifiedCount = 0;
-    
-    for (const d of snap.docs) {
-      const refData = d.data();
-      const completedDoc = await getDoc(doc(db, "completed_tasks", refData.referredId));
-      if (completedDoc.exists()) {
-        const completedData = completedDoc.data();
-        if (Object.keys(completedData || {}).length >= 3) {
-          qualifiedCount++;
-        }
-      }
-    }
-    
-    return qualifiedCount;
+    return snap.size;
   } catch (e) {
     console.error("getReferralCount error", e);
     return 0;

@@ -46,7 +46,7 @@ export function WithdrawCountdown() {
         <button onClick={() => navigate(-1)} className="w-10 h-10 flex items-center justify-center text-white/80 active:scale-95 transition-transform bg-white/[0.04] backdrop-blur-2xl border border-white/[0.05] rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.2)]">
           <ChevronLeft className="w-5 h-5" />
         </button>
-        <h1 className="text-xl font-bold tracking-tight text-white/90">Trade & Withdraw</h1>
+        <h1 className="text-xl font-bold tracking-tight text-white/90">Withdraw</h1>
       </header>
 
       <div className="px-4 flex flex-col items-center pt-8">
@@ -54,9 +54,9 @@ export function WithdrawCountdown() {
           <Lock className="w-8 h-8 text-[#8792FF]" />
         </div>
         
-        <h2 className="text-2xl font-black mb-2 text-center text-white/90">Trade & Withdraw Available Soon</h2>
+        <h2 className="text-2xl font-black mb-2 text-center text-white/90">Withdraw Available Soon</h2>
         <p className="text-white/50 text-sm text-center mb-10 max-w-[240px]">
-          Trading and Withdrawals will be enabled on<br/>
+          Withdrawals will be enabled on<br/>
           <strong className="text-white/80">August 5, 2026, 12:00 UTC</strong>
         </p>
 

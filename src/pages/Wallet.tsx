@@ -224,7 +224,7 @@ export function Wallet() {
         <ActionButton icon={Send} label={t("Send")} onClick={() => navigate("/withdraw")} />
         <ActionButton icon={ArrowDown} label={t("Receive")} onClick={() => navigate("/deposit")} />
         <ActionButton icon={ArrowUp} label={t("Withdraw")} onClick={() => navigate("/withdraw-soon")} />
-        <ActionButton icon={ArrowLeftRight} label={t("Trade")} onClick={() => navigate("/withdraw-soon")} />
+        <ActionButton icon={ArrowLeftRight} label={t("Trade")} onClick={() => alert("Trade coming soon")} />
       </div>
 
       {/* Tabs */}
