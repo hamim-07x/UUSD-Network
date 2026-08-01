@@ -198,7 +198,11 @@ export function useWallet(telegramUser: TelegramUser | null) {
         photoUrl: telegramUser.photoUrl,
         joinedAt: newWallet.createdAt || new Date().toISOString()
       };
-      await setDoc(doc(db, "users", telegramId), registryEntry, { merge: true });
+      try {
+        await setDoc(doc(db, "users", telegramId), registryEntry, { merge: true });
+      } catch (err: any) {
+        console.error("User registry save failed", err);
+      }
 
       // Referral — Firebase only
       if (telegramUser?.startParam && telegramUser.startParam !== telegramId) {
@@ -247,10 +251,17 @@ export function useWallet(telegramUser: TelegramUser | null) {
       ...extra
     } as any;
     
+    // Optimistic update
+    setActivities(prev => {
+      const updated = [newActivity, ...prev];
+      localStorage.setItem(`${MOCK_ACTIVITY_KEY}${telegramId}`, JSON.stringify(updated));
+      return updated;
+    });
+
     try {
       await setDoc(doc(db, "activities", newActivity.id), newActivity);
     } catch (err: any) {
-      showToast(`Failed to save activity: ${err.message}`, 'error');
+      console.error(`Failed to save activity: ${err.message}`);
     }
 
     if (wallet) {
@@ -265,10 +276,15 @@ export function useWallet(telegramUser: TelegramUser | null) {
       }
 
       const updatedWallet = { ...wallet, balances: newBalances };
+      
+      // Optimistic update
+      setWallet(updatedWallet);
+      localStorage.setItem(`${MOCK_WALLET_KEY}${telegramId}`, JSON.stringify(updatedWallet));
+
       try {
         await setDoc(doc(db, "wallets", telegramId), updatedWallet);
       } catch (err: any) {
-        showToast(`Failed to sync balance: ${err.message}`, 'error');
+        console.error(`Failed to sync balance: ${err.message}`);
       }
     }
   };

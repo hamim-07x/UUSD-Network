@@ -58,6 +58,8 @@ export function AdminPanel() {
   const [botUsername, setBotUsername] = useState(localStorage.getItem("mock_bot_username") || "our_bot");
   const [supportUsername, setSupportUsername] = useState(localStorage.getItem("mock_support_username") || "support");
   const [minTransferAmount, setMinTransferAmount] = useState(localStorage.getItem("mock_min_transfer") || "10");
+  const [maintenanceMode, setMaintenanceMode] = useState(false);
+  const [maintenanceTwitterLink, setMaintenanceTwitterLink] = useState("");
   const [telegramBotToken, setTelegramBotToken] = useState("");
   const [twitterBearerToken, setTwitterBearerToken] = useState("");
   const [apiSaveMsg, setApiSaveMsg] = useState("");
@@ -155,6 +157,8 @@ export function AdminPanel() {
           if (g.botUsername) setBotUsername(g.botUsername);
           if (g.supportUsername) setSupportUsername(g.supportUsername);
           if (g.minTransferAmount !== undefined) setMinTransferAmount(String(g.minTransferAmount));
+          if (g.maintenanceMode !== undefined) setMaintenanceMode(g.maintenanceMode);
+          if (g.maintenanceTwitterLink !== undefined) setMaintenanceTwitterLink(g.maintenanceTwitterLink);
         }
         const apiSnap = await getDoc(doc(db, "settings", "api_keys"));
         if (apiSnap.exists()) {
@@ -315,6 +319,8 @@ export function AdminPanel() {
         botUsername: botUsername.trim(),
         supportUsername: supportUsername.trim(),
         minTransferAmount: Number(minTransferAmount) || 0,
+        maintenanceMode,
+        maintenanceTwitterLink: maintenanceTwitterLink.trim(),
         updatedAt: new Date().toISOString(),
       }, { merge: true });
 
@@ -938,6 +944,22 @@ export function AdminPanel() {
                         className="flex-1 bg-[#0c0d12] border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:border-[#8792FF] outline-none" />
                     </div>
                     <p className="text-[11px] text-white/30 mt-1.5">Used when users tap “Contact Support”</p>
+                  </div>
+
+                  <div className="pt-4 border-t border-white/5">
+                    <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wider mb-4">Maintenance Mode</h3>
+                    <label className="flex items-center gap-2 cursor-pointer mb-4">
+                      <input type="checkbox" checked={maintenanceMode} onChange={e => setMaintenanceMode(e.target.checked)} className="rounded border-white/10 bg-[#0c0d12] w-5 h-5 text-[#8792FF]" />
+                      <span className="text-sm text-white/70">Enable Maintenance Mode (Blocks regular users)</span>
+                    </label>
+                    {maintenanceMode && (
+                      <div>
+                        <label className="text-xs text-white/50 mb-1.5 block">Twitter Link for Maintenance Screen</label>
+                        <div className="flex items-center gap-2">
+                          <input value={maintenanceTwitterLink} onChange={e => setMaintenanceTwitterLink(e.target.value)} placeholder="https://x.com/..." className="flex-1 bg-[#0c0d12] border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:border-[#8792FF] outline-none" />
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 

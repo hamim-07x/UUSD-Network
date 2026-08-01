@@ -14,6 +14,8 @@ import { useTelegramUser } from "../../hooks/useTelegramUser";
 import { useWallet } from "../../hooks/useWallet";
 import { SettingsProvider } from "../../lib/SettingsContext";
 import { Wallet as WalletIcon } from "lucide-react";
+import { db } from "../../lib/firebase";
+import { doc, onSnapshot } from "firebase/firestore";
 
 export function AppLayout() {
   const location = useLocation();
@@ -26,6 +28,9 @@ export function AppLayout() {
   // Wallet creation progress (10-15 seconds)
   const [showCreationAnim, setShowCreationAnim] = useState(false);
   const [creationProgress, setCreationProgress] = useState(0);
+
+  const [isMaintenanceMode, setIsMaintenanceMode] = useState(false);
+  const [maintenanceTwitterLink, setMaintenanceTwitterLink] = useState("");
 
   useEffect(() => {
     if (WebApp.initDataUnsafe?.user || typeof window !== "undefined") {
@@ -50,6 +55,18 @@ export function AppLayout() {
       setIsInitializing(false);
     }
   }, [isWalletLoading, minTimeDone]);
+
+  // Listen for maintenance mode
+  useEffect(() => {
+    const unsub = onSnapshot(doc(db, "settings", "global"), (snap) => {
+      if (snap.exists()) {
+        const data = snap.data();
+        setIsMaintenanceMode(!!data.maintenanceMode);
+        setMaintenanceTwitterLink(data.maintenanceTwitterLink || "");
+      }
+    });
+    return () => unsub();
+  }, []);
 
   // Creation animation: ~12 seconds then create wallet
   useEffect(() => {
@@ -89,8 +106,26 @@ export function AppLayout() {
           {isInitializing && <LoadingScreen key="loading-screen" />}
         </AnimatePresence>
 
-        {/* FORCE WALLET CREATION GATE — no other page until wallet exists */}
-        {!isInitializing && needsCreation ? (
+        {/* MAINTENANCE MODE GATE */}
+        {!isInitializing && isMaintenanceMode ? (
+          <div className="min-h-[100dvh] w-full flex flex-col items-center justify-center px-6 bg-[#13141a] text-white">
+            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center text-center max-w-sm w-full">
+              <div className="w-24 h-24 rounded-3xl bg-[#8792FF]/10 flex items-center justify-center mb-6 border border-[#8792FF]/20 shadow-[0_0_40px_rgba(135,146,255,0.15)] overflow-hidden">
+                <img src="/logo.jpg" alt="Logo" className="w-full h-full object-cover" />
+              </div>
+              <h1 className="text-2xl font-bold text-white mb-2">Temporarily Disabled</h1>
+              <p className="text-white/60 mb-8 text-sm leading-relaxed">
+                The mini app is temporarily suspended due to technical reasons. Please stay tuned for updates.
+              </p>
+              {maintenanceTwitterLink && (
+                <a href={maintenanceTwitterLink} target="_blank" rel="noopener noreferrer" className="w-full bg-[#1DA1F2] hover:bg-[#1a91da] text-white font-bold py-3.5 px-6 rounded-2xl transition-all text-center shadow-[0_0_24px_rgba(29,161,242,0.35)]">Follow our Twitter for updates</a>
+              )}
+            </motion.div>
+          </div>
+        ) : 
+
+        /* FORCE WALLET CREATION GATE — no other page until wallet exists */
+        !isInitializing && needsCreation ? (
           <div className="min-h-[100dvh] w-full flex flex-col items-center justify-center px-6 bg-[#13141a] text-white">
             <motion.div
               initial={{ opacity: 0, y: 16 }}
