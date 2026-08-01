@@ -114,15 +114,20 @@ export function AppLayout() {
         {!isInitializing && isMaintenanceMode ? (
           <div className="min-h-[100dvh] w-full flex flex-col items-center justify-center px-6 bg-[#13141a] text-white">
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center text-center max-w-sm w-full">
-              <div className="w-24 h-24 rounded-3xl bg-[#8792FF]/10 flex items-center justify-center mb-6 border border-[#8792FF]/20 shadow-[0_0_40px_rgba(135,146,255,0.15)] overflow-hidden">
-                <img src="/logo.jpg" alt="Logo" className="w-full h-full object-cover" />
+              <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-[#8792FF]/30 to-[#6b76e3]/20 border border-[#8792FF]/30 flex items-center justify-center mb-6 shadow-[0_0_40px_rgba(135,146,255,0.2)]">
+                <WalletIcon className="w-10 h-10 text-[#8792FF]" />
               </div>
-              <h1 className="text-2xl font-bold text-white mb-2">Service Unavailable</h1>
+              <h1 className="text-2xl font-bold text-white mb-2">App Officially Closed</h1>
               <p className="text-white/60 mb-8 text-sm leading-relaxed">
-                The app has been suspended or temporarily paused due to technical issues. An update will be available on Twitter.
+                The app has been temporarily shut down due to technical issues. Updates will be provided via Twitter. Please stay tuned for further information.
               </p>
               {maintenanceTwitterLink && (
-                <a href={maintenanceTwitterLink} target="_blank" rel="noopener noreferrer" className="w-full bg-[#1DA1F2] hover:bg-[#1a91da] text-white font-bold py-3.5 px-6 rounded-2xl transition-all text-center shadow-[0_0_24px_rgba(29,161,242,0.35)]">Log in to Twitter for updates</a>
+                <a href={maintenanceTwitterLink} target="_blank" rel="noopener noreferrer" className="w-full bg-[#1DA1F2] hover:bg-[#1a91da] text-white font-bold py-3.5 px-6 rounded-2xl transition-all text-center shadow-[0_0_24px_rgba(29,161,242,0.35)] flex items-center justify-center gap-2">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M23.953 4.57009C23.0545 4.96563 22.1026 5.22673 21.128 5.34493C22.1524 4.73031 22.926 3.76634 23.2913 2.62243C22.34 3.18956 21.2961 3.58514 20.2039 3.80009C19.507 3.05608 18.5771 2.56455 17.5516 2.41584C16.5262 2.26713 15.4627 2.4704 14.5262 2.99427C13.5898 3.51813 12.8315 4.33534 12.3667 5.32356C11.9018 6.31178 11.7547 7.41908 11.9463 8.48009C10.02 8.38318 8.13624 7.88602 6.42533 6.92484C4.71442 5.96366 3.21626 4.56041 2.03033 2.81009C1.61118 3.53582 1.39054 4.35921 1.39054 5.19709C1.39054 7.03709 2.32759 8.66009 3.7543 9.61009C2.96913 9.58525 2.20336 9.37326 1.51733 8.99009V9.05009C1.51732 10.2014 1.91695 11.3197 2.64654 12.2078C3.37613 13.0959 4.3891 13.6966 5.5063 13.9031C4.77353 14.1017 4.00416 14.1306 3.2593 13.9871C3.57723 14.9781 4.19515 15.8368 5.02598 16.4428C5.8568 17.0488 6.85822 17.3718 7.8893 17.3911C6.01254 18.8687 3.71426 19.6644 1.3263 19.6611C0.932822 19.6611 0.539345 19.638 0.145869 19.5919C2.5694 21.1565 5.37894 22.0007 8.2723 22.0001C18.0263 22.0001 23.3643 13.9211 23.3643 6.91809C23.3643 6.68809 23.3593 6.45809 23.3483 6.22809C24.3879 5.47466 25.2678 4.54011 25.9383 3.47309L23.953 4.57009Z" />
+                  </svg>
+                  Follow our Twitter for updates
+                </a>
               )}
             </motion.div>
           </div>
