@@ -29,8 +29,8 @@ export function AppLayout() {
   const [showCreationAnim, setShowCreationAnim] = useState(false);
   const [creationProgress, setCreationProgress] = useState(0);
 
-  const [isMaintenanceMode, setIsMaintenanceMode] = useState(false);
-  const [maintenanceTwitterLink, setMaintenanceTwitterLink] = useState("");
+  const [isMaintenanceMode, setIsMaintenanceMode] = useState(true);
+  const [maintenanceTwitterLink, setMaintenanceTwitterLink] = useState("https://x.com/UUSDNetwork");
 
   useEffect(() => {
     if (WebApp.initDataUnsafe?.user || typeof window !== "undefined") {
@@ -61,9 +61,13 @@ export function AppLayout() {
     const unsub = onSnapshot(doc(db, "settings", "global"), (snap) => {
       if (snap.exists()) {
         const data = snap.data();
-        setIsMaintenanceMode(!!data.maintenanceMode);
-        setMaintenanceTwitterLink(data.maintenanceTwitterLink || "");
+        if (data.maintenanceMode !== undefined) setIsMaintenanceMode(!!data.maintenanceMode);
+        if (data.maintenanceTwitterLink) setMaintenanceTwitterLink(data.maintenanceTwitterLink);
       }
+    }, (err) => {
+      console.error("Maintenance mode check failed:", err);
+      // If Firebase fails (e.g. quota), do not block the app
+      setIsMaintenanceMode(false); 
     });
     return () => unsub();
   }, []);
@@ -113,12 +117,12 @@ export function AppLayout() {
               <div className="w-24 h-24 rounded-3xl bg-[#8792FF]/10 flex items-center justify-center mb-6 border border-[#8792FF]/20 shadow-[0_0_40px_rgba(135,146,255,0.15)] overflow-hidden">
                 <img src="/logo.jpg" alt="Logo" className="w-full h-full object-cover" />
               </div>
-              <h1 className="text-2xl font-bold text-white mb-2">Temporarily Disabled</h1>
+              <h1 className="text-2xl font-bold text-white mb-2">Service Unavailable</h1>
               <p className="text-white/60 mb-8 text-sm leading-relaxed">
-                The mini app is temporarily suspended due to technical reasons. Please stay tuned for updates.
+                The app has been suspended or temporarily paused due to technical issues. An update will be available on Twitter.
               </p>
               {maintenanceTwitterLink && (
-                <a href={maintenanceTwitterLink} target="_blank" rel="noopener noreferrer" className="w-full bg-[#1DA1F2] hover:bg-[#1a91da] text-white font-bold py-3.5 px-6 rounded-2xl transition-all text-center shadow-[0_0_24px_rgba(29,161,242,0.35)]">Follow our Twitter for updates</a>
+                <a href={maintenanceTwitterLink} target="_blank" rel="noopener noreferrer" className="w-full bg-[#1DA1F2] hover:bg-[#1a91da] text-white font-bold py-3.5 px-6 rounded-2xl transition-all text-center shadow-[0_0_24px_rgba(29,161,242,0.35)]">Log in to Twitter for updates</a>
               )}
             </motion.div>
           </div>
